@@ -1,0 +1,21 @@
+{% extends 'index.html' %}
+
+{% block title %} Удаление машино-места {% endblock title %}
+
+{% block content %}
+
+<!-- Аннотация страницы-->
+<main class="main">
+  <div class="wrapper">
+    <form class="delete-card__form" method="POST">
+      {% csrf_token %}
+      <h1 class="delete-card__title">Удаление машино-места</h1>
+      <h4 class="delete-card__subtitle">Машино-место будет <b>безвозвратно</b> удалено.</h4>
+      {{ form.media }} <!-- Теперь нам нужна только готовая форма и кнопка -->
+      {{ form.as_table }}
+      <button type="submit" class="delete-card__form-button">Удалить машино-место</button>
+    </form>
+  </div>
+</main>
+
+{% endblock content %}

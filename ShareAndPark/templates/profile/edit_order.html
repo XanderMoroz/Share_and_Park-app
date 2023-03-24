@@ -1,0 +1,80 @@
+{% extends 'index.html' %}
+
+{% block title %} Завершение брони {% endblock title %}
+ 
+{% block content %}
+<!-- Аннотация страницы-->
+<main class="main">
+  <div class="wrapper">
+    <form class="delete-card__form" method="POST">
+      {% csrf_token %}
+        <h1 class="delete-card__title">Завершение аренды машино-места</h1>
+
+        {% if rent_hours == 0 %}                <!-- ЕСЛИ ДЛИТЕЛЬНОСТЬ АРЕНДЫ МЕНЬШЕ ЧАСА -->
+
+            {% if rent_minutes == 0 %}          <!-- ЕСЛИ ДЛИТЕЛЬНОСТЬ АРЕНДЫ МЕНЬШЕ МИНУТЫ -->
+
+            <h4 class="delete-card__subtitle" style="text-align: center">
+                Длительность аренды меньше одной минуты.
+            </h4>
+
+            {% else %}                          <!-- ЕСЛИ ДЛИТЕЛЬНОСТЬ АРЕНДЫ БОЛЬШЕ МИНУТЫ -->
+
+            <h4 class="delete-card__subtitle" style="text-align: center">
+                Длительность аренды составляет {{ rent_minutes }} мин.
+            </h4>
+
+            {% endif %}                         <!-- КОНЕЦ УСЛОВИЯ -->
+
+        {% else %}                              <!-- ЕСЛИ ДЛИТЕЛЬНОСТЬ АРЕНДЫ БОЛЬШЕ ЧАСА -->
+
+        <h4 class="delete-card__subtitle" style="text-align: center">
+          Длительность аренды составила {{ rent_hours }} ч. {{ rent_minutes }} мин.
+      </h4>
+
+        {% endif %}
+
+      <h4 class="delete-card__subtitle" style="text-align: center">
+        С вашего счета спишется {{ total_price }} ₽.
+      </h4>
+<!--      {{ form.media }}-->
+      {{ form.non_field_errors }}
+      {{ form.source.errors }}
+      {{ form.source }}
+
+      {{ form.orderState.errors}}
+
+      {% load widget_tweaks %}
+      {% render_field form.orderState class="delete-card__select" style="min-width: 300px; border-radius: 8px" %}
+      {% for hidden_field in form.hidden_fields %}
+          {% if hidden_field.errors %}
+          <ul>
+              {% for error in hidden_field.errors %}
+              <li>(hidden field {{ hidden_field.name }})</li>
+              {% endfor %}
+          </ul>
+          {% endif %}
+          {{hidden_field}}
+          {% endfor %}
+
+<!--      {{ form.as_table }}-->
+      <button id="submit-order" class="delete-card__form-button" style="min-width: 300px; border-radius: 8px; margin-top: 24px" type="submit" >
+        Оплатить
+      </button>
+    </form>
+  </div>
+</main>
+
+<script>
+    function validateButton() {
+    let select = document.querySelector('#id_orderState')
+    let button = document.querySelector('#submit-order')
+    select.value === 'OFF'
+        ? button.disabled = false
+        : button.disabled = true
+}
+validateButton()
+document.querySelector('#id_orderState').addEventListener('change', validateButton)
+</script>
+
+{% endblock content %}

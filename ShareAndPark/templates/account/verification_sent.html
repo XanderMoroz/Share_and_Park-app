@@ -1,0 +1,17 @@
+{% extends 'index.html' %}
+
+{% load i18n %}
+
+{% block head_title %}{% trans "Verify Your E-mail Address" %}{% endblock %}
+
+{% block content %}
+
+<main class="main">
+  <div class="wrapper"
+       style="flex-direction: column; align-items: center; justify-content: flex-start; gap: 32px;">
+      <h1 class="delete-card__title">{% trans "Verify Your E-mail Address" %}</h1>
+      <h5 style="word-break: break-word; text-align: center;" class="delete-card__subtitle">{% blocktrans %}Мы отправили вам электронное письмо для проверки. Перейдите по предоставленной ссылке, чтобы завершить процесс регистрации. Если вы не видите письмо с подтверждением в своем основном почтовом ящике, проверьте папку со спамом. {% endblocktrans %}</h5>
+  </div>
+</main>
+
+{% endblock %}

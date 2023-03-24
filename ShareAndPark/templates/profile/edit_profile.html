@@ -1,0 +1,195 @@
+{% extends 'index.html' %}
+
+{% block title %} Редактирование профиля {% endblock title %}
+ 
+{% block content %}
+<!-- Аннотация страницы-->
+<!--<section class="section">-->
+<!--        <h1 class="title">Редактирование профиля</h1>-->
+<!--        <h2 class="subtitle">-->
+<!--        Здесь вы можете <strong>исправить</strong> данные своего профиля. Поправьте поля, расположенные ниже.-->
+<!--        </h2>-->
+<!--</section>-->
+
+
+<main class="main">
+     {% load static %}
+
+      <div class="wrapper" style="justify-content: center">
+        <div class="profile__content" style="padding: 0 30px">
+          <h2 class="profile__title">Редактирование профиля</h2>
+
+            <form style="width: 100%"
+                  method="POST" enctype="multipart/form-data">
+
+                {% csrf_token %}
+
+                {{ form.non_field_errors }}
+
+                {{ form.source.errors }}
+                {{ form.source }}
+
+                {{ form.media.errors }}
+                {{ form.media }}
+
+
+                <div class="profile__user">
+                    <h5 class="profile__subtitle">Общие сведения</h5>
+
+
+                    <!-- ПОЛЕ С ИМЕНЕМ ПОЛЬЗОВАТЕЛЯ НАЧАЛО  -->
+                    <div class="profile__form-field">
+                        <label class="profile__form-label">
+                           Имя
+                        </label>
+                        {{ form.name }}
+                        {{ form.name.errors }}
+                    </div>
+                    <!-- ПОЛЕ С ИМЕНЕМ ПОЛЬЗОВАТЕЛЯ КОНЕЦ  -->
+
+                    <!-- ПОЛЕ С ФАМИЛИЕЙ ПОЛЬЗОВАТЕЛЯ НАЧАЛО  -->
+                    <div class="profile__form-field">
+                        <label class="profile__form-label">
+                            Фамилия
+                        </label>
+                        {{ form.surname }}
+                        {{ form.surname.errors }}
+                    </div>
+                    <!-- ПОЛЕ С ФАМИЛИЕЙ ПОЛЬЗОВАТЕЛЯ КОНЕЦ  -->
+
+                    <!-- ПОЛЕ С НОМЕРОМ ТЕЛЕФОНА ПОЛЬЗОВАТЕЛЯ КОНЕЦ  -->
+
+                    <!-- ПОЛЕ С ПОЧТОЙ ПОЛЬЗОВАТЕЛЯ НАЧАЛО  -->
+                    <div class="profile__form-field">
+                        <label class="profile__form-label">
+                            E-mail
+                        </label>
+                        <input id="profile-email"
+                               placeholder="{{ user.email }}"
+                               class="profile__form-input"
+                               type="text"
+                               disabled>
+                    </div>
+                    <!-- ПОЛЕ С ПОЧТОЙ ПОЛЬЗОВАТЕЛЯ КОНЕЦ  -->
+
+                    <!-- ПОЛЕ С НОМЕРОМ ТЕЛЕФОНА ПОЛЬЗОВАТЕЛЯ НАЧАЛО  -->
+                    <div class="profile__form-field">
+                        <label class="profile__form-label">
+                            Номер телефона
+                        </label>
+                        {{ form.phoneNumber }}
+                        {{ form.phoneNumber.errors }}
+                    </div>
+
+                    {% for hidden_field in form.hidden_fields %}
+                    {% if hidden_field.errors %}
+                    <ul>
+                        {% for error in hidden_field.errors %}
+                        <li>(hidden field {{ hidden_field.name }})</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                    {{hidden_field}}
+                    {% endfor %}
+
+                    <!-- Теперь нам нужна только готовая форма и кнопка -->
+<!--                    <input type="submit" value="Применить изменения">-->
+
+                    <button style="align-self: center" class="profile__form-edit-button" type="submit">
+                  Применить изменения
+                    </button>
+                </div>
+            </form>
+
+        </div>
+      </div>
+
+</main>
+
+
+
+<!--<form method="POST" enctype="multipart/form-data">-->
+<!--    {% csrf_token %}-->
+<!--&lt;!&ndash;    {{ form.media }}&ndash;&gt;-->
+
+<!--    {{ form.non_field_errors }}-->
+
+<!--    {{ form.source.errors }}-->
+<!--    {{ form.source }}-->
+
+<!--    {{ form.media.errors }}-->
+<!--    {{ form.media }}-->
+
+<!--    <table border="1">-->
+<!--        <tr>-->
+<!--            <th>{{ form.photo.label_tag }}</th>-->
+<!--            <td>-->
+<!--                {{ form.photo.errors }}-->
+<!--                {{ form.photo }}-->
+<!--            </td>-->
+<!--        </tr>-->
+
+<!--&lt;!&ndash;         <tr>&ndash;&gt;-->
+<!--&lt;!&ndash;            <th>{{ form.user.label_tag.is_hidden }}</th>&ndash;&gt;-->
+<!--&lt;!&ndash;            <td>&ndash;&gt;-->
+<!--&lt;!&ndash;                {{ form.user.errors.is_hidden }}&ndash;&gt;-->
+<!--&lt;!&ndash;                {{ form.user.is_hidden }}&ndash;&gt;-->
+<!--&lt;!&ndash;            </td>&ndash;&gt;-->
+<!--&lt;!&ndash;        </tr>&ndash;&gt;-->
+
+<!--        <tr>-->
+<!--            <th>{{ form.name.label_tag }}</th>-->
+<!--            <td>-->
+<!--                {{ form.name.errors }}-->
+<!--                {{ form.name }}-->
+<!--            </td>-->
+<!--        </tr>-->
+
+<!--        <tr>-->
+<!--            <th>{{ form.surname.label_tag }}</th>-->
+<!--            <td>-->
+<!--                {{ form.surname.errors }}-->
+<!--                {{ form.surname }}-->
+<!--            </td>-->
+<!--        </tr>-->
+
+<!--        <tr>-->
+<!--            <th>{{ form.phoneNumber.label_tag }}</th>-->
+<!--            <td>-->
+<!--                {{ form.phoneNumber.errors }}-->
+<!--                {{ form.phoneNumber }}-->
+<!--            </td>-->
+<!--        </tr>-->
+
+<!--        <tr>-->
+<!--            <th>{{ form.afertaSubmission.label_tag }}</th>-->
+<!--            <td>-->
+<!--                {{ form.afertaSubmission.errors }}-->
+<!--                {{ form.afertaSubmission }}-->
+<!--            </td>-->
+<!--        </tr>-->
+
+<!--    </table>-->
+
+<!--    {% for hidden_field in form.hidden_fields %}-->
+<!--    {% if hidden_field.errors %}-->
+<!--    <ul>-->
+<!--        {% for error in hidden_field.errors %}-->
+<!--        <li>(hidden field {{ hidden_field.name }})</li>-->
+<!--        {% endfor %}-->
+<!--    </ul>-->
+<!--    {% endif %}-->
+<!--    {{hidden_field}}-->
+<!--    {% endfor %}-->
+
+<!--    &lt;!&ndash; Теперь нам нужна только готовая форма и кнопка &ndash;&gt;-->
+<!--    <input type="submit" value="Применить изменения">-->
+<!--</form>-->
+
+<!--<form method="POST" enctype="multipart/form-data">-->
+<!--    {% csrf_token %}-->
+<!--    {{ form.media }}-->
+<!--    {{ form.as_p }}&lt;!&ndash; Теперь нам нужна только готовая форма и кнопка &ndash;&gt;-->
+<!--    <input type="submit" value="Применить изменения">-->
+<!--</form>-->
+{% endblock content %}

@@ -1,0 +1,407 @@
+{% extends 'index.html' %}
+
+{% block title %} Личный кабинет {% endblock %}
+
+{% block content %}
+
+<main class="main">
+  {% load static %}
+  <button class="scroll-button">
+    <img src="{% static 'icons/scroll-button.svg' %}" alt=""/>
+  </button>
+  <div class="wrapper">
+    <section class="profile">
+      <div class="wrapper">
+        <div class="profile__content">
+          <h2 class="profile__title">Личный кабинет</h2>
+          <form class="profile__form">
+            <div class="profile__user">
+              <h5 class="profile__subtitle">Общие сведения</h5>
+
+              <!-- ПОЛЕ С ИМЕНЕМ ПОЛЬЗОВАТЕЛЯ НАЧАЛО  -->
+              <div class="profile__form-field">
+                <label class="profile__form-label">
+                  Имя
+                </label>
+                <input
+                    id="profile-fullName"
+                    placeholder="{{ profile.name }}"
+                    class="profile__form-input"
+                    type="text" disabled>
+              </div>
+              <!-- ПОЛЕ С ИМЕНЕМ ПОЛЬЗОВАТЕЛЯ КОНЕЦ  -->
+
+              <!-- ПОЛЕ С ФАМИЛИЕЙ ПОЛЬЗОВАТЕЛЯ НАЧАЛО  -->
+              <div class="profile__form-field">
+                <label class="profile__form-label">
+                  Фамилия
+                </label>
+                <input
+                    placeholder="{{ profile.surname }}"
+                    class="profile__form-input"
+                    type="text"
+                    disabled>
+              </div>
+              <!-- ПОЛЕ С ФАМИЛИЕЙ ПОЛЬЗОВАТЕЛЯ КОНЕЦ  -->
+
+              <!-- ПОЛЕ С ПОЧТОЙ ПОЛЬЗОВАТЕЛЯ НАЧАЛО  -->
+              <div class="profile__form-field">
+                <label class="profile__form-label">
+                  E-mail
+                </label>
+                <input id="profile-email"
+                       placeholder="{{ user.email }}"
+                       class="profile__form-input"
+                       type="text"
+                       disabled>
+              </div>
+              <!-- ПОЛЕ С ПОЧТОЙ ПОЛЬЗОВАТЕЛЯ КОНЕЦ  -->
+
+              <!-- ПОЛЕ С НОМЕРОМ ТЕЛЕФОНА ПОЛЬЗОВАТЕЛЯ НАЧАЛО  -->
+              <div class="profile__form-field">
+                <label class="profile__form-label">
+                  Номер телефона
+                </label>
+                <input
+                    placeholder="{{ profile.phoneNumber }}"
+                    class="profile__form-input"
+                    type="text" disabled>
+              </div>
+              <!-- ПОЛЕ С НОМЕРОМ ТЕЛЕФОНА ПОЛЬЗОВАТЕЛЯ КОНЕЦ  -->
+
+              <button class="profile__form-edit-button" type="button">
+                <a href="{% url 'edit_profile' profile.id %}">Редактировать </a>
+              </button>
+            </div>
+
+            <!--           РАЗДЕЛ С МОИМИ БАНКОВСКИМИ КАРТАМИ НАЧАЛО                    -->
+            <div class="profile__payment">
+              <h5 class="profile__subtitle">
+                Платежные данные
+              </h5>
+
+              {% if my_cards %} <!-- ЕСЛИ КАРТА ДОБАВЛЕНА В ПРОФИЛЬ -->
+
+              {% for my_card in my_cards %}
+
+              <div class="profile__form-field">
+                <label class="profile__form-label">
+                  Номер карты
+                </label>
+                <input
+                    id="profile-card-number"
+                    placeholder="{{ my_card.card_number }}"
+                    class="profile__form-input"
+                    type="text"
+                    disabled
+                />
+              </div>
+              <div class="profile__form-double-field">
+                <div class="profile__form-field">
+                  <label class="profile__form-label">
+                    Дата
+                  </label>
+                  <input id="profile-card-expiration"
+                         placeholder="{{ my_card.expired_month }}/{{ my_card.expired_year }}"
+                         class="profile__form-input"
+                         type="text"
+                         disabled
+                  >
+                </div>
+                <div class="profile__form-field">
+                  <label class="profile__form-label">
+                    CVC
+                  </label>
+                  <input
+                      id="profile-card-cvc"
+                      placeholder="***"
+                      class="profile__form-input"
+                      type="password"
+                      disabled
+                  >
+                </div>
+
+              </div>
+              <a class="profile__form-edit-button" href="{% url 'update_bankcard' my_card.id %}"
+                 class="parking__tab-link">
+                Редактировать
+              </a>
+            </div>
+            <!--           РАЗДЕЛ С МОИМИ БАНКОВСКИМИ КАРТАМИ КОНЕЦ                    -->
+
+
+            {% endfor %}
+
+
+            {% else %} <!-- ЕСЛИ НЕ ДОБАВЛЕНО НИ ОДНОЙ КАРТЫ -->
+
+            <a href="{% url 'create_bankcard'%}" class="parking__tab-link">
+              Добавить банковскую карту
+            </a>
+
+            {% endif %} <!-- КОНЕЦ УСЛОВИЯ -->
+
+          </form>
+        </div>
+      </div>
+    </section>
+
+
+    <section class="parking">
+      <div class="wrapper">
+        <div class="parking__content">
+
+              <!--        РАЗДЕЛ С ТАБАМИ НАЧАЛО   -->
+          <div class="parking__tabs">
+            <button class="parking__tabs-button active" onclick="setActiveProfileTab()">
+              Водитель
+            </button>
+            <button class="parking__tabs-button" onclick="setActiveProfileTab()">
+              Владелец
+            </button>
+          </div>
+          <!--        РАЗДЕЛ С ТАБАМИ КОНЕЦ   -->
+
+          <!-- ------ РАЗДЕЛ ВОДИТЕЛЯ НАЧАЛО ------------  -->
+          <div id="driver-tab" class="parking__tab active">
+            <h6 class="parking__tab-title">
+              Текущая парковка
+            </h6>
+            <div class="parking__tab-cards">
+              {% if my_orders %}
+              {% for order in my_orders %}
+              <a href="{% url 'update_order' order.id%}" class="parking__cards-item">
+                {% load static %}
+                <img src="{{order.parkingPlace.image.url}}"
+                     alt=""
+                     class="parking__cards-cover">
+                <div class="parking__cards-description">
+                  <h5 class="parking__cards-address">
+                    {{ order.parkingPlace.title}}
+                  </h5>
+                  <h6 class="parking__cards-station">{{ order.parkingPlace.get_subway_station_display}}</h6>
+                  <p class="parking__cards-price">{{ order.parkingPlace.pricePerHour }} ₽ / час</p>
+                  <h5 class="parking__cards-status">Аренда с {{order.creation_date | date:'H:i d.m.y'}}</h5>
+                </div>
+              </a>
+
+              {% endfor %}
+              {% else %}
+              <p style="font-size: 20px; width: 100%; text-align: center; color: #EA3800">Вы пока ничего не арендуете</p>
+              {% endif %}
+            </div>
+            <h6 class="parking__tab-title">
+              История расходов
+            </h6>
+            <div class="parking__tab-history">
+
+              {% if my_payments %}
+              {% for payment in my_payments %}
+
+              <div class="parking__history-item">
+                <span class="parking__history-date">{{ payment.creation_date | date:'d.m.y H:i' }}</span>
+                <span class="parking__history-amount"> - {{ payment.amount }} ₽</span>
+              </div>
+              {% endfor %}
+              {% else %}
+              <p style="font-size: 20px; width: 100%; text-align: center; color: #EA3800">Слава богу вы еще ничего не потратили</p></p>
+              {% endif %}
+
+            </div>
+          </div>
+          <!-- ------ РАЗДЕЛ ВОДИТЕЛЯ КОНЕЦ ------------  -->
+
+          <!-- ------ РАЗДЕЛ ВЛАДЕЛЬЦА НАЧАЛО ------------  -->
+          <div id="owner-tab" class="parking__tab">
+            <h6 class="parking__tab-title">
+              Ваша парковка
+            </h6>
+            <div class="parking__tab-cards">
+              {% if my_places %}
+              {% for my_place in my_places %}
+              <a href="{% url 'parking_detail' my_place.id %}" class="parking__cards-item">
+                {% load static %}
+                <img src="{{ my_place.image.url}}"
+                     alt=""
+                     class="parking__cards-cover"
+                />
+                <div class="parking__cards-description">
+                  <h5 class="parking__cards-address">
+                    {{my_place.title}}
+                  </h5>
+                  <h6 class="parking__cards-station"> {{my_place.get_subway_station_display }}</h6>
+                  <p class="parking__cards-price"> {{ my_place.pricePerHour }} руб./час</p>
+                  <h5 class="parking__cards-status">{{my_place.creation_date | date:'d.M.Y.'}}</h5>
+                </div>
+              </a>
+              {% endfor %}
+              {% else %}
+              <p style="font-size: 20px; width: 100%; text-align: center; color: #EA3800">Вы еще не добавили ни одного места </p>
+              {% endif %}
+            </div>
+
+            {% if my_cards %} <!-- ЕСЛИ КАРТА ДОБАВЛЕНА В ПРОФИЛЬ -->
+
+            <a href="{% url 'create_parking' %}" class="parking__tab-link">
+              Добавить место
+            </a>
+
+            {% else %} <!-- ЕСЛИ КАРТА НЕ ДОБАВЛЕНА В ПРОФИЛЬ -->
+
+            <a href="{% url 'create_bankcard' %}" class="parking__tab-link">
+              Добавить место
+            </a>
+            {% endif %}
+
+            <h6 class="parking__tab-title">
+              История
+            </h6>
+            <div class="parking__tab-history">
+
+              {% if my_profits %}
+              {% for profit in my_payments %}
+
+              <div class="parking__history-item">
+                <span class="parking__history-date">
+                  {{ profit.creation_date | date:'d.m.y H:i ' }}</span>
+                <span class="parking__history-amount">+ {{ payment.amount }} ₽</span>
+              </div>
+
+              {% endfor %}
+              {% else %}
+              <p style="font-size: 20px; width: 100%; text-align: center; color: #EA3800">К сожалению вы еще ничего не заработали </p>
+              {% endif %}
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+
+    <!--    <section class="parking">-->
+    <!--      <div class="wrapper">-->
+    <!--        <div class="parking__content">-->
+    <!--          <div class="parking__tabs">-->
+    <!--            <button class="parking__tabs-button " onclick="setActiveProfileTab()">-->
+    <!--              Водитель-->
+    <!--            </button>-->
+    <!--            <button class="parking__tabs-button active" onclick="setActiveProfileTab()">-->
+    <!--              Владелец-->
+    <!--            </button>-->
+    <!--          </div>-->
+
+
+    <!--          &lt;!&ndash;                 РАЗДЕЛ ВОДИТЕЛЯ НАЧАЛО                        &ndash;&gt;-->
+    <!--          <div id="driver-tab" class="parking__tab active">-->
+    <!--&lt;!&ndash;            <h6 class="parking__tab-title">&ndash;&gt;-->
+    <!--&lt;!&ndash;              Текущая парковкаevve&ndash;&gt;-->
+    <!--&lt;!&ndash;&lt;!&ndash;              {% load static %}&ndash;&gt;&ndash;&gt;-->
+    <!--&lt;!&ndash;            </h6>&ndash;&gt;-->
+    <!--            <div class="parking__tab-cards">-->
+    <!--                        {% if my_orders  %}-->
+
+    <!--                    {% for my_order in my_orders %}-->
+
+    <!--              <a href="{% url 'update_order' my_order.id %}" class="parking__cards-item">-->
+    <!--                <img src="{{ my_order..parkingPlace.image.url }}"-->
+    <!--                     alt=""-->
+    <!--                     class="parking__cards-cover">-->
+    <!--                <div class="parking__cards-description">-->
+    <!--                  <h5 class="parking__cards-address">-->
+    <!--                    {{ my_order.parkingPlace.title }}-->
+    <!--                  </h5>-->
+    <!--                  <h6 class="parking__cards-station">{{ my_order.parkingPlace.subway_station }}</h6>-->
+    <!--                  <p class="parking__cards-price">{{ my_order.parkingPlace.pricePerHour }} руб./час</p>-->
+    <!--                  <h5 class="parking__cards-status">Занято {{ my_order.creation_date | date:'d.M.Y.' }}</h5>-->
+    <!--                </div>-->
+    <!--              </a>-->
+    <!--              {% empty %}-->
+
+    <!--              {% endfor %}-->
+    <!--              {% endif %}-->
+
+    <!--            </div>-->
+    <!--&lt;!&ndash;            <h6 class="parking__tab-title">&ndash;&gt;-->
+    <!--&lt;!&ndash;              История&ndash;&gt;-->
+    <!--&lt;!&ndash;            </h6>&ndash;&gt;-->
+
+    <!--            <div class="parking__tab-history">-->
+    <!--                {% if my_payments %}-->
+    <!--                {% for my_payment in my_payments %}-->
+    <!--              <div class="parking__history-item">-->
+    <!--                <span class="parking__history-date">{{ my_payment.creation_date }} </span>-->
+    <!--                <span class="parking__history-amount">{{ my_payment.amount }} руб. </span>-->
+    <!--              </div>-->
+    <!--               {% empty %}-->
+    <!--              <h2 class="subtitle">Слава богу вы еще ничего не потратили...</h2>-->
+    <!--              {% endfor %}-->
+    <!--              {% endif %}-->
+
+    <!--            </div>-->
+    <!--          </div>-->
+    <!--          &lt;!&ndash;                 РАЗДЕЛ ВОДИТЕЛЯ КОНЕЦ                        &ndash;&gt;-->
+
+
+    <!--          &lt;!&ndash;                 РАЗДЕЛ ВЛАДЕЛЬЦА НАЧАЛО                        &ndash;&gt;-->
+    <!--          <div id="owner-tab" class="parking__tab">-->
+    <!--            <h6 class="parking__tab-title">-->
+    <!--              Ваша парковка-->
+    <!--&lt;!&ndash;              {% load static %}&ndash;&gt;-->
+    <!--            </h6>-->
+
+    <!--            <div class="parking__tab-cards">-->
+
+    <!--              {% if my_places %} &lt;!&ndash; ЕСЛИ МАШИНО-МЕСТА СУЩЕСТВУЮТ В ПРОФИЛЬ &ndash;&gt;-->
+
+    <!--              {% for my_place in my_places %}-->
+
+    <!--              &lt;!&ndash; КАРТОЧКА МАШИНО-МЕСТА НАЧАЛО &ndash;&gt;-->
+
+    <!--              <a class="catalog__cards-item" href="{% url 'update_parking' my_place.id %}">-->
+    <!--                  <img class="catalog__cards-cover" src="{{ my_place.image.url }}">-->
+    <!--                  <div class="catalog__cards-description">-->
+    <!--                      <h5 class="catalog__cards-address">-->
+    <!--                          {{ my_place.title | truncatewords:7 }}-->
+    <!--                      </h5>-->
+    <!--                      <h6 class="catalog__cards-station">-->
+    <!--                          {{ my_place.get_subway_station_display }}-->
+    <!--                      </h6>-->
+    <!--                      <p class="catalog__cards-price">{{ my_place.pricePerHour }}</p>-->
+    <!--                  </div>-->
+    <!--              </a>-->
+
+
+    <!--              {% empty %}-->
+    <!--              <h2>No Results</h2>-->
+    <!--              {% endfor %}-->
+    <!--              &lt;!&ndash; КАРТОЧКА МАШИНО-МЕСТА КОНЕЦ &ndash;&gt;-->
+
+    <!--              {% endif %}-->
+
+    <!--            </div>-->
+    <!--            <a href="{% url 'create_parking' %}">Добавить место</a>-->
+
+
+    <!--            <h6 class="parking__tab-title">-->
+    <!--              История-->
+    <!--            </h6>-->
+    <!--            <div class="parking__tab-history">-->
+    <!--              <div class="parking__history-item">-->
+    <!--                <span class="parking__history-date">27 дек. 18.23 - 19.54</span>-->
+    <!--                <span class="parking__history-amount">300 руб.</span>-->
+    <!--              </div>-->
+    <!--            </div>-->
+    <!--          </div>-->
+
+
+    <!--          &lt;!&ndash;                 РАЗДЕЛ ВЛАДЕЛЬЦА КОНЕЦ                        &ndash;&gt;-->
+    <!--        </div>-->
+    <!--      </div>-->
+    <!--    </section>-->
+  </div>
+</main>
+
+
+{% endblock content %}

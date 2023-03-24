@@ -1,0 +1,106 @@
+<!--/templates/register.html-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content=""/>
+  <meta name="author" content="Konstantin Volik"/>
+  <title>Парковки Москвы</title>
+  {% load static %}
+  <link rel="stylesheet" type="text/css" href="{% static 'styles/index.css' %}">
+  <link rel="icon" type="image/x-icon" href="{% static 'icons/favicon.svg' %}">
+</head>
+<body>
+
+
+<div id="registration-modal" class="modal__body">
+  <div class="modal__header">
+    <h2 class="modal__title">Регистрация</h2>
+  </div>
+  <form method="POST" class="modal__main">
+    {% csrf_token %}
+
+    {% load widget_tweaks %}
+    <div class="modal__field">
+      <label class="modal__label">
+        Ваш логин
+      </label>
+      {% render_field form.username class="modal__input" placeholder="username" type="text" %}
+      {{ form.username.errors }}
+    </div>
+
+    <div class="modal__field">
+      <label class="modal__label">
+        Ваша почта
+      </label>
+      {% render_field form.email class="modal__input" placeholder="example@mail.ru" type="email" %}
+      {{ form.email.errors }}
+    </div>
+
+    <div class="modal__field">
+      <label class="modal__label">
+        Ввведите пароль
+      </label>
+      <div class="modal__input-container">
+        {% render_field form.password1 class="modal__input" placeholder="*****" type="password" %}
+        <button class="modal__hide-password" onclick="togglePassword()">
+        </button>
+      </div>
+      {{ form.password1.errors }}
+    </div>
+
+    <div class="modal__field">
+      <label class="modal__label">
+        Подтвердите пароль
+      </label>
+
+      <div class="modal__input-container">
+        {% render_field form.password2 class="modal__input" placeholder="*****" type="password" %}
+        <button class="modal__hide-password" onclick="togglePassword()">
+        </button>
+      </div>
+      {{ form.password2.errors }}
+    </div>
+
+    {{ form.non_field_errors }}
+
+    {{ form.source.errors }}
+    {{ form.source }}
+    <button class="modal__submit" type="submit">
+      Продолжить
+    </button>
+    <a class="modal__toggle" href="{%url 'login' %}">
+      Уже есть аккаунт? Войти
+    </a>
+<!--    <a href="" class="modal__toggle">-->
+<!--      Забыли пароль? Восстановить пароль-->
+<!--    </a>-->
+  </form>
+</div>
+
+
+</div>
+
+</body>
+</html>
+
+
+<!--<div>-->
+<!--    {% block content %}-->
+<!--    {% load widget_tweaks %}-->
+
+<!--<h2>Register</h2>-->
+
+<!--<h2> Войти в систему </h2>-->
+<!--<form method="post">-->
+<!--{% csrf_token %}-->
+<!--{{ form.as_p }}-->
+<!--<input type="submit" value="Продолжить">-->
+<!--</form>-->
+
+<!--<a href="{% url 'login' %}">Back to login</a>-->
+<!--<a href="{% url 'welcome page' %}">Back to Home</a>-->
+<!--{% endblock %}-->
+<!--</div>-->

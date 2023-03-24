@@ -1,0 +1,151 @@
+{% extends 'index.html' %} <!-- наследуемся от шаблона index.html -->
+
+{% block title %} Страница машино-места {% endblock title %}
+
+{% block content %}
+
+<main class="main">
+{% load static %}
+  <button class="scroll-button">
+    <img src="{% static 'icons/scroll-button.svg' %}" alt=""/>
+  </button>
+
+  <section class="parking-place">
+    <div class="wrapper">
+      <div class="parking-place__content">
+        <div class="parking-place__cover">
+          <img src="{{ parking_detail.image.url }}" alt="">
+        </div>
+        <div class="parking-place__description">
+          <h5 class="parking-place__owner">
+            Владелец - {{ parking_detail.owner.name }} {{ parking_detail.owner.surname }} {{ parking_detail.owner.phoneNumber }}
+          </h5>
+          <h2 class="parking-place__address">{{ parking_detail.title }}</h2>
+          <h3 class="parking-place__station">{{ parking_detail.get_subway_station_display }}</h3>
+          <h2 class="parking-place__address">{{ parking_detail.pricePerHour }} ₽ / час</h2>
+          <div class="parking-place__actions">
+
+
+            {% if request.user.is_authenticated %} <!-- ЕСЛИ ПОЛЬЗОВАТЕЛЬ АВТОРИЗОВАЛСЯ -->
+
+            {% if parking_detail.owner.user == request.user %} <!-- ЕСЛИ ПОЛЬЗОВАТЕЛЬ ВЛАДЕЛЕЦ -->
+
+            <!-- ПРЕДЛАГАЕМ ОТРЕДАКТИРОВАТЬ МАШИНО-МЕСТО -->
+            <form class=class="parking-place__button-rent>
+              <a href="{%url 'update_parking' parking_detail.id %}"
+                 class="parking-place__button-rent" >
+                  Редактировать
+              </a>
+            </form>
+
+            {% else %} <!-- ЕСЛИ ПОЛЬЗОВАТЕЛЬ НЕ ВЛАДЕЛЕЦ -->
+
+            {% if parking_detail.readyToRent == 'ON' %} <!-- ЕСЛИ ПАРКОВКА СВОБОДНА -->
+
+            {% if user_cards %} <!-- ЕСЛИ У ПОЛЬЗОВАТЕЛЯ ПРИВЯЗАНА КАРТА -->
+
+            <form class=class="parking-place__button-rent
+                  method="POST" >
+              {% csrf_token %}
+              {{ form }}
+              <button class="parking-place__button-rent" type="submit">
+                  Арендовать
+              </button>
+            </form>
+
+            {% else %} <!-- ЕСЛИ У ПОЛЬЗОВАТЕЛЯ НЕ ПРИВЯЗАНА КАРТА -->
+
+            <a href="{% url 'create_bankcard' %}" class="parking-place__button-rent">
+                  Арендовать
+              </a>
+
+            {% endif %} <!-- КОНЕЦ УСЛОВИЯ -->
+
+            {% else %} <!-- ЕСЛИ ПАРКОВКА НЕ СВОБОДНА -->
+
+            <form method="POST" >
+                <button class=class="parking-place__button-rent"
+                        type="submit"
+                        disabled>
+                  Не доступно
+                </button>
+            </form>
+
+            {% endif %}
+
+            {% endif %}
+
+            {% else %} <!-- ЕСЛИ ПОЛЬЗОВАТЕЛЬ НЕ АВТОРИЗОВАЛСЯ -->
+
+            <!-- ОТПРАВЛЯЕМ НА АВТОРИЗАЦИЮ -->
+            <form class=class="parking-place__button-rent>
+              <a href="{%url 'login' %}" class="parking-place__button-rent" >
+                  Арендовать
+              </a>
+            </form>
+            {% endif %}
+
+<!--            <button class="parking-place__button-rent">Арендовать</button>-->
+
+            <button class="parking-place__button-rent" onclick="back()">Назад</button>
+          </div>
+          <h5 class="parking-place__description-title">Описание</h5>
+          <p id='description' class="parking-place__description-detailed">
+            {{ parking_detail.description }}
+          </p>
+          <button class="parking-place__button-expanding" onclick="toggleDescription()">Раскрыть целиком</button>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+
+
+  <section class="catalog">
+    <div class="wrapper">
+      <div class="catalog__content">
+
+        <h2 class="catalog__title">
+          Места рядом с метро "{{ current_station}}"
+        </h2>
+        <div class="catalog__cards">
+
+          {% if places_around %}
+              {% for place_around in places_around %}
+
+          <a href="{% url 'parking_detail' place_around.id %}" class="catalog__cards-item">
+            {% load static %}
+            <img
+                src="{{ place_around.image.url}}"
+                alt="Фото машино-места"
+                class="catalog__cards-cover">
+            <div class="catalog__cards-description">
+              <h5 class="catalog__cards-address">
+                {{ place_around.title }}
+              </h5>
+              <h6 class="catalog__cards-station">
+                {{ place_around.get_subway_station_display }}
+              </h6>
+              <p class="catalog__cards-price">{{ place_around.pricePerHour }} ₽ / час</p>
+            </div>
+          </a>
+
+             {% endfor %}
+              {% else %}
+
+              <h5 class="catalog__title">
+                К сожалению, рядом с метро "{{ current_station }}" не найдено ни одного места
+              </h5>
+              {% endif %}
+
+        </div>
+
+      </div>
+    </div>
+  </section>
+</main>
+
+{% endblock content %}
+
+

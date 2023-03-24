@@ -1,0 +1,135 @@
+{% extends 'index.html' %}
+
+{% block title %} Редактирование данных банковской карты {% endblock title %}
+ 
+{% block content %}
+
+<main class="main">
+  {% load static %}
+  {% load widget_tweaks %}
+  <div class="wrapper">
+
+    <div class="wrapper">
+      <div class="profile__content">
+        <h2 class="profile__title">
+          Редактирование данных банковской карты
+        </h2>
+
+        <form style="width: 100%" method="POST" autocomplete="off">
+
+          {% csrf_token %}
+
+          {{ form.non_field_errors }}
+
+          {{ form.source.errors }}
+          {{ form.source }}
+
+          {{ form.media.errors }}
+          {{ form.media }}
+          <!--           РАЗДЕЛ С МОИМИ БАНКОВСКИМИ КАРТАМИ НАЧАЛО                    -->
+
+          <div class="profile__payment">
+            <h5 class="profile__subtitle">
+              Платежные данные
+            </h5>
+
+            <!-- ПОЛЕ С НОМЕРОМ КАРТЫ  НАЧАЛО  -->
+            <div class="profile__form-field">
+              <label class="profile__form-label">
+                <!--                        {{ form.card_number.label_tag }} -->
+                Номер банковской карты
+              </label>
+              {% render_field form.card_number type="text" id='number'%}
+              {{ form.card_number.errors }}
+            </div>
+            <!-- ПОЛЕ С НОМЕРОМ КАРТЫ КОНЕЦ  -->
+
+            <div class="profile__form-double-field">
+
+              <!-- ПОЛЕ С МЕСЯЦЕМ ОКОНЧАНИЯ КАРТЫ НАЧАЛО  -->
+              <div class="profile__form-field">
+                <label class="profile__form-label">
+                  <!--                        {{ form.expired_month.label_tag }} -->
+                  Месяц
+                </label>
+                {% render_field form.expired_month type="text" id='month'%}
+                {{ form.expired_month.errors }}
+              </div>
+              <!-- ПОЛЕ С МЕСЯЦЕМ ОКОНЧАНИЯ КАРТЫ КОНЕЦ  -->
+
+              <!-- ПОЛЕ С ГОДОМ ОКОНЧАНИЯ КАРТЫ НАЧАЛО  -->
+              <div class="profile__form-field">
+                <label class="profile__form-label">
+                  Год
+                </label>
+                {% render_field form.expired_year type="text" id='year' %}
+                {{ form.expired_year.errors }}
+              </div>
+              <!-- ПОЛЕ С ГОДОМ ОКОНЧАНИЯ КАРТЫ КОНЕЦ  -->
+
+              <!-- ПОЛЕ С СЕКРЕТНЫМ КОДОМ КАРТЫ НАЧАЛО  -->
+              <div class="profile__form-field">
+                <label class="profile__form-label">
+                  CVV/CVC
+                </label>
+                {% render_field form.CVC type="password" id='cvc' %}
+                {{ form.CVC.errors }}
+              </div>
+            </div>
+            <!-- ПОЛЕ С СЕКРЕТНЫМ КОДОМ КАРТЫ КОНЕЦ  -->
+
+            <!-- РАЗДЕЛ С МОИМИ БАНКОВСКИМИ КАРТАМИ КОНЕЦ -->
+
+            {% for hidden_field in form.hidden_fields %}
+            {% if hidden_field.errors %}
+            <ul>
+              {% for error in hidden_field.errors %}
+              <li>(hidden field {{ hidden_field.name }})</li>
+              {% endfor %}
+            </ul>
+            {% endif %}
+            {{hidden_field}}
+            {% endfor %}
+
+            <!-- Теперь нам нужна только готовая форма и кнопка -->
+            <button class="profile__form-edit-button" type="submit">
+              Применить изменения
+            </button>
+
+          </div>
+        </form>
+        </form>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+    let number = document.querySelector('#number')
+    let month = document.querySelector('#month')
+    let year = document.querySelector('#year')
+    let cvc = document.querySelector('#cvc')
+
+    number.addEventListener('input', () => mask(16));
+    number.addEventListener('input', onlyDigits);
+    month.addEventListener('input', () => mask(2));
+    month.addEventListener('input', onlyDigits);
+    year.addEventListener('input', () => mask(2))
+    year.addEventListener('input', onlyDigits);
+    year.addEventListener('input', () => mask(3))
+    cvc.addEventListener('input', onlyDigits);
+
+
+    function mask(number) {
+        const element = event.target
+        element.value.length > number && (element.value = element.value.slice(0, number))
+    }
+
+    function onlyDigits() {
+        event.target.value = event.target.value.replace(/\D/g, '');
+    }
+</script>
+
+
+
+{% endblock content %}

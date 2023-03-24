@@ -1,0 +1,218 @@
+{% extends 'index.html' %}
+
+{% block title %} Каталог машино-мест {% endblock title %}
+
+{% block content %}
+
+<main class="main">
+  {% load static %}
+
+  {% if search_res %}  <!-- ЕСЛИ ПОИСКОВОЙ ЗАПРОС СУЩЕСТВУЕТ -->
+
+  <!-- ------------ОТОБРАЖЕНИЕ КАРТЫ С РЕЗУЛЬТАТАМИ ПОИСКА НАЧАЛО--------------  -->
+  <section class="map">
+    <div class="map__content">
+      {{map|safe}}
+      <script>{{map | safe }} </script>
+    </div>
+  </section>
+  <!-- ------------ОТОБРАЖЕНИЕ КАРТЫ С РЕЗУЛЬТАТАМИ ПОИСКА КОНЕЦ--------------  -->
+
+  {% else %} <!-- ЕСЛИ ПОИСКОВОЙ ЗАПРОС НЕ СУЩЕСТВУЕТ-------------------------- -->
+
+  <!-- ------------ОТОБРАЖЕНИЕ КАРТЫ С РЕЗУЛЬТАТАМИ ФИЛЬТРАЦИИ НАЧАЛО--------------  -->
+  <section class="map">
+    <div class="map__content">
+      {{map|safe}}
+      <script>{
+          {
+              map | safe
+          }
+      }</script>
+    </div>
+  </section>
+  <!-- ------------ОТОБРАЖЕНИЕ КАРТЫ С РЕЗУЛЬТАТАМИ ФИЛЬТРАЦИИ КОНЕЦ--------------  -->
+
+  {% endif %}
+
+  <section class="catalog">
+    <div class="wrapper">
+      <div class="catalog__content">
+        <div class="catalog__header">
+          <h2 class="catalog__title">
+            Каталог
+          </h2>
+          <h5 class="catalog__subtitle">
+            Найдите нужное место на карте или через поиск по каталогу
+          </h5>
+        </div>
+        <div class="catalog__main">
+          <div class="catalog__search-block">
+
+            <form style="width: 100%">
+              {% csrf_token %}
+              <label class="catalog__label">Поиск</label>
+              <div class="catalog__search-block-actions">
+                <div class="catalog__search-input-container">
+                  <input placeholder="Введите название улицы..."
+                         class="catalog__search-block-input"
+                         type="text"
+                         name="query"
+                  >
+                  <button
+                      class="catalog__search-button"
+                      type="submit"
+                      onclick="() => event.preventDefault()"
+                  ></button>
+                </div>
+
+                <button class="catalog__search-block-filters"
+                        type="button"
+                        onclick="toggleFilters()">
+                  <img src="{% static 'icons/filter.svg' %}" alt="">
+                </button>
+              </div>
+            </form>
+
+
+            {% load widget_tweaks %}
+            <div class="catalog__filters">
+
+
+
+
+
+                        <form  method="GET" style="width: 100%;">
+                {% csrf_token %}
+                {{ form.non_field_errors }}
+
+                {{ form.source.errors }}
+                {{ form.source }}
+
+                {{ form.media.errors }}
+                {{ form.media }}
+                <div class="catalog__form">
+                  <div class="parking-place__form-field">
+                    <label class="parking-place__form-label">
+                      {{ filter.form.readyToRent.label_tag }}
+                    </label>
+                    {{ filter.form.readyToRent.errors }}
+                    {% render_field filter.form.readyToRent class="catalog__filters-select" %}
+                  </div>
+                  <div class="parking-place__form-field">
+                    <label class="parking-place__form-label">
+                      {{ filter.form.subway_station.label_tag }}
+                    </label>
+                    {{ filter.form.subway_station.errors }}
+                    {% render_field filter.form.subway_station class="catalog__filters-select" %}
+                  </div>
+                </div>
+
+                <div class="catalog__filters-field" style="margin: 30px auto; width: 100%">
+                  <div class="catalog__filters-range-labels">
+                    <label class="catalog__filters-label" style="margin-bottom: 16px">Цена</label>
+                    <label id="price-display" class="catalog__filters-label">
+                      <span id="startPrice"></span> - <span id="endPrice"></span>
+                    </label>
+                  </div>
+                  <div class="catalog__filters-range-container">
+
+                  </div>
+                  <div class="catalog__filters-range-indicators">
+                    <label class="catalog__filters-label">0</label>
+                    <label class="catalog__filters-label">2500</label>
+                    <label class="catalog__filters-label">5000</label>
+                  </div>
+                </div>
+                  {% render_field filter.form.price__gt  type="number" class='hidden' %}
+                  {{ filter.form.price__gt.errors }}
+                  {% render_field filter.form.price__lt type="number" class='hidden' %}
+                  {{ filter.form.price__lt.errors }}
+
+                <button class="catalog__submit-filters" type="submit"
+                        onclick="() => event.preventDefault()">
+                  Применить фильтры
+                </button>
+              </form>
+
+
+
+
+
+
+            </div>
+          </div>
+
+          <div class="catalog__cards">
+            {% if search_res %} <!-- ЕСЛИ ПОИСКОВОЙ ЗАПРОС СУЩЕСТВУЕТ -->
+
+            {% for parking_place in search_res %}
+            {% if request.user.is_authenticated %}
+            <!-- ОТОБРАЖЕНИЕ МАШИНОМЕСТ ПО РЕЗУЛЬТАТАМ ПОИСКА НАЧАЛО -->
+            <a class="catalog__cards-item" href="{% url 'parking_detail' parking_place.id %}">
+              {% else %}
+              <a class="catalog__cards-item" href="{% url 'login' %}">
+                {% endif %}
+                <img class="catalog__cards-cover" src="{{ parking_place.image.url }}">
+                <div class="catalog__cards-description">
+                  <h5 class="catalog__cards-address">
+                    {{ parking_place.title | truncatewords:7 }}
+                  </h5>
+                  <h6 class="catalog__cards-station">
+                    {{ parking_place.get_subway_station_display }}
+                  </h6>
+                  <p class="catalog__cards-price">{{ parking_place.pricePerHour }} ₽ / час </p>
+
+                </div>
+              </a>
+            </a>
+            <!-- ОТОБРАЖЕНИЕ МАШИНОМЕСТ ПО РЕЗУЛЬТАТАМ ПОИСКА КОНЕЦ -->
+            {% empty %}
+            <h2 style="text-align: center; margin: 20px auto">По результатам вашего поиска нет машиномест</h2>
+            {% endfor %}
+
+            {% else %} <!-- ЕСЛИ ПОИСКОВОЙ ЗАПРОС НЕ СУЩЕСТВУЕТ-- -->
+
+            {% for parking_place in filter.qs %}
+
+            {% if request.user.is_authenticated %}
+
+            <!-- ОТОБРАЖЕНИЕ МАШИНОМЕСТ ПО РЕЗУЛЬТАТАМ ФИЛЬТРАЦИИ НАЧАЛО -->
+            <a class="catalog__cards-item" href="{% url 'parking_detail' parking_place.id %}">
+              {% else %}
+              <a class="catalog__cards-item" href="{% url 'login' %}">
+                {% endif %}
+                <img class="catalog__cards-cover" src="{{ parking_place.image.url }}">
+                <div class="catalog__cards-description">
+                  <h5 class="catalog__cards-address">
+                    {{ parking_place.title | truncatewords:7 }}
+                  </h5>
+                  <h6 class="catalog__cards-station">
+                    {{ parking_place.get_subway_station_display }}
+                  </h6>
+                  <p class="catalog__cards-price">
+                    {{ parking_place.pricePerHour }} ₽ / час
+                  </p>
+                </div>
+              </a>
+            </a>
+
+            <!-- ОТОБРАЖЕНИЕ МАШИНОМЕСТ ПО РЕЗУЛЬТАТАМ ФИЛЬТРАЦИИ КОНЕЦ -->
+            {% empty %}
+            <h2 style="text-align: center; margin: 20px auto">По данным фильтрам нет результата</h2>
+            {% endfor %}
+
+            {% endif %} <!-- ЗАВЕРШЕНИЕ УСЛОВИЯ-- -->
+            <!--Блок для карточек-->
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+</main>
+<script src="{% static 'plugins/noUiSlider-15.7.0/dist/nouislider.js' %}"></script>
+<script src="{% static 'js/catalog.js' %}"></script>
+
+{% endblock content %}

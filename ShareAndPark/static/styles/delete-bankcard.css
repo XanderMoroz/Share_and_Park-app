@@ -1,0 +1,125 @@
+.delete-card__form {
+  margin: 30px auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.delete-card__title {
+  font-style: normal;
+  font-weight: 600;
+  font-size: 32px;
+  line-height: 39px;
+  margin-bottom: 10px;
+}
+
+.delete-card__subtitle {
+  font-style: normal;
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 30px;
+  margin-bottom: 10px;
+}
+.delete-card__select {
+  padding: 15px 20px;
+  background: white url("../icons/dropdown.svg") top 24px right 24px no-repeat;
+  width: 200px;
+  appearance: none;
+  font-size: 20px;
+  line-height: 24px;
+}
+.delete-card__form-button {
+  padding: 15px 20px;
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 24px;
+  color: white;
+  border-radius: 7px;
+  background: var(--secondary-color);
+  margin-top: 0;
+}
+
+.delete-card__form-button:disabled {
+    background: gray;
+    color: black;
+  }
+
+@media screen and (min-width: 600px) and (max-width: 1199px) {
+  .delete-card__form {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+
+  }
+
+  .delete-card__title {
+    font-style: normal;
+    font-weight: 600;
+    font-size: 20px;
+    line-height: 24px;
+    margin-bottom: 15px;
+  }
+
+  .delete-card__subtitle {
+    font-style: normal;
+    font-weight: 600;
+    font-size: 15px;
+    line-height: 19px;
+    margin-bottom: 15px;
+  }
+  .delete-card__select {
+    padding: 10px 15px;
+    background: white url("../icons/dropdown.svg") top 16px right 16px no-repeat;
+    width: 200px;
+    appearance: none;
+    font-size: 15px;
+    line-height: 18px;
+  }
+  .delete-card__form-button {
+    padding: 10px 15px;
+    font-size: 15px;
+    line-height: 18px;
+  }
+}
+
+
+@media screen and (min-width: 300px) and (max-width: 599px) {
+  .delete-card__form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    width: 100%;
+    padding: 0 30px;
+  }
+
+  .delete-card__title {
+    font-size: 16px;
+    line-height: 19px;
+    margin-bottom: 15px;
+  }
+
+  .delete-card__subtitle {
+    font-size: 12px;
+    line-height: 15px;
+    margin-bottom: 10px;
+  }
+  .delete-card__select {
+    padding: 10px 15px;
+    background: white url("../icons/dropdown.svg") top 16px right 16px no-repeat;
+    width: 274px;
+    appearance: none;
+    font-size: 15px;
+    line-height: 18px;
+  }
+  .delete-card__form-button {
+    padding: 10px 15px;
+    font-size: 14px;
+    line-height: 17px;
+  }
+}

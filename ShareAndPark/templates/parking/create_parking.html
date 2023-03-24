@@ -1,0 +1,220 @@
+{% extends 'index.html' %}
+
+{% block title %} Добавление машино-места {% endblock title %}
+ 
+{% block content %}
+
+<main class="main">
+    {% load static %}
+  <button class="scroll-button">
+    <img src="{% static 'icons/scroll-button.svg' %}" alt=""/>
+  </button>
+
+  <section class="parking-place">
+    <div class="wrapper">
+      <div class="parking-place__content create">
+
+        <form class="parking-place__form" enctype="multipart/form-data"
+              method="POST" >
+          <h2 class="parking-place__form-title">Добавление нового места</h2>
+
+          {% csrf_token %}
+
+          {{ form.non_field_errors }}
+
+          {{ form.source.errors }}
+          {{ form.source }}
+
+          {{ form.media.errors }}
+          {{ form.media }}
+
+            {% load widget_tweaks %}
+
+          <!-- ПОЛЕ С ЛОКАЦИЕЙ МАШИНО-МЕСТА НАЧАЛО  -->
+          <div class="parking-place__form-field">
+            <label class="parking-place__form-label">
+              Расположение на карте
+            </label>
+            {{ form.location.errors }}
+            {{ form.location }}
+          </div>
+          <!-- ПОЛЕ С ЛОКАЦИЕЙ МАШИНО-МЕСТА КОНЕЦ  -->
+
+
+          <!-- ПОЛЕ С АДРЕСОМ МАШИНО-МЕСТА НАЧАЛО  -->
+          <div class="parking-place__form-field">
+            <label class="parking-place__form-label">
+              Адрес (улица, ближайший дом)
+            </label>
+            {{ form.title.errors }}
+            {{ form.title }}
+          </div>
+          <!-- ПОЛЕ С АДРЕСОМ МАШИНО-МЕСТА КОНЕЦ  -->
+
+          <div class="parking-place__form-double">
+
+            <!-- ПОЛЕ С ЦЕНОЙ МАШИНО-МЕСТА НАЧАЛО  -->
+            <div class="parking-place__form-field">
+              <label class="parking-place__form-label">
+                Цена за час
+              </label>
+              {{ form.pricePerHour.errors }}
+              {{ form.pricePerHour }}
+            </div>
+            <!-- ПОЛЕ С ЦЕНОЙ МАШИНО-МЕСТА КОНЕЦ  -->
+
+            <!-- ПОЛЕ С БЛИЖАЙШИМ МЕТРО НАЧАЛО  -->
+            <div class="parking-place__form-field">
+              <label class="parking-place__form-label">
+                Ближайшее метро
+              </label>
+              {{ form.subway_station.errors }}
+              {{ form.subway_station }}
+            </div>
+            <!-- ПОЛЕ С БЛИЖАЙШИМ МЕТРО КОНЕЦ  -->
+
+          </div>
+
+          <!-- ПОЛЕ С ОПИСАНИЕМ МАШИНО-МЕСТА НАЧАЛО  -->
+          <div class="parking-place__form-field">
+            <label class="parking-place__form-label">
+              Описание
+            </label>
+            {{ form.description.errors }}
+            {{ form.description }}
+          </div>
+          <!-- ПОЛЕ С ОПИСАНИЕМ МАШИНО-МЕСТА КОНЕЦ  -->
+
+            <div class="parking-place__form-double">
+
+            <!-- ПОЛЕ С ЦЕНОЙ МАШИНО-МЕСТА НАЧАЛО  -->
+            <!-- ПОЛЕ СО СТАТУСОМ МАШИНО-МЕСТА НАЧАЛО  -->
+          <div class="parking-place__form-field">
+            <label class="parking-place__form-label">
+              {{ form.readyToRent.label_tag }}
+              Статус
+            </label>
+            {{ form.readyToRent.errors }}
+            {{ form.readyToRent }}
+          </div>
+          <!-- ПОЛЕ СО СТАТУСОМ МАШИНО-МЕСТА КОНЕЦ  -->
+
+             <!-- ПОЛЕ С фОТОГРАФИЕЙ МАШИНО-МЕСТА НАЧАЛО  -->
+          <div class="parking-place__form-field">
+            <label class="parking-place__form-label">
+              {{ form.image.label_tag }}
+              Статус
+            </label>
+            {{ form.image.errors }}
+            <button class="parking-place__button-rent" onclick="document.getElementById('id_image').click()">
+              Выберите файл
+              {% render_field form.image class="hidden" placeholder="up" type="file" %}
+            </button>
+<!--              {% render_field form.image class="parking-place__button-rent" placeholder="up" type="file" %}-->
+          </div>
+          <!-- ПОЛЕ С фОТОГРАФИЕЙ МАШИНО-МЕСТА КОНЕЦ  -->
+
+          </div>
+
+          {% for hidden_field in form.hidden_fields %}
+          {% if hidden_field.errors %}
+          <ul>
+            {% for error in hidden_field.errors %}
+            <li>(hidden field {{ hidden_field.name }})</li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+          {{hidden_field}}
+          {% endfor %}
+
+
+
+             <button class="parking-place__button-rent" type="submit" >Сохранить</button>
+
+        </form>
+
+      </div>
+    </div>
+  </section>
+</main>
+
+<!--<section class="section">-->
+<!--    <form method="POST" enctype="multipart/form-data">-->
+<!--    {% csrf_token %}-->
+
+<!--    {{ form.non_field_errors }}-->
+
+<!--    {{ form.source.errors }}-->
+<!--    {{ form.source }}-->
+
+<!--    {{ form.media.errors }}-->
+<!--    {{ form.media }}-->
+
+<!--    <table border="1">-->
+<!--        <tr>-->
+<!--            <th>{{ form.location.label_tag }}</th>-->
+<!--            <td>-->
+<!--                {{ form.location.errors }}-->
+<!--                {{ form.location }}-->
+<!--            </td>-->
+<!--        </tr>-->
+
+<!--        <tr>-->
+<!--            <th>{{ form.title.label_tag }}</th>-->
+<!--            <td>-->
+<!--                {{ form.title.errors }}-->
+<!--                {{ form.title }}-->
+<!--            </td>-->
+<!--        </tr>-->
+
+<!--        <tr>-->
+<!--            <th>{{ form.description.label_tag }}</th>-->
+<!--            <td>-->
+<!--                {{ form.description.errors }}-->
+<!--                {{ form.description }}-->
+<!--            </td>-->
+<!--        </tr>-->
+
+<!--        <tr>-->
+<!--            <th>{{ form.pricePerHour.label_tag }}</th>-->
+<!--            <td>-->
+<!--                {{ form.pricePerHour.errors }}-->
+<!--                {{ form.pricePerHour }}-->
+<!--            </td>-->
+<!--        </tr>-->
+
+<!--        <tr>-->
+<!--            <th>{{ form.subway_station.label_tag }}</th>-->
+<!--            <td>-->
+<!--                {{ form.subway_station.errors }}-->
+<!--                {{ form.subway_station }}-->
+<!--            </td>-->
+<!--        </tr>-->
+
+<!--        <tr>-->
+<!--            <th>{{ form.image.label_tag }}</th>-->
+<!--            <td>-->
+<!--                {{ form.image.errors }}-->
+<!--                {{ form.image }}-->
+<!--            </td>-->
+<!--        </tr>-->
+
+<!--    </table>-->
+
+<!--    {% for hidden_field in form.hidden_fields %}-->
+<!--    {% if hidden_field.errors %}-->
+<!--    <ul>-->
+<!--        {% for error in hidden_field.errors %}-->
+<!--        <li>(hidden field {{ hidden_field.name }})</li>-->
+<!--        {% endfor %}-->
+<!--    </ul>-->
+<!--    {% endif %}-->
+<!--    {{hidden_field}}-->
+<!--    {% endfor %}-->
+
+<!--    &lt;!&ndash; Теперь нам нужна только готовая форма и кнопка &ndash;&gt;-->
+<!--    <input type="submit" value="Применить изменения">-->
+<!--</form>-->
+
+</section>
+{% endblock content %}

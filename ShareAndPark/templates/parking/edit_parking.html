@@ -1,0 +1,161 @@
+{% extends 'index.html' %}
+
+{% block title %} Редактирование машино-места {% endblock title %}
+
+{% block content %}
+<main class="main">
+  {% load static %}
+  <button class="scroll-button">
+    <img src="{% static 'icons/scroll-button.svg' %}" alt=""/>
+  </button>
+
+  <section class="parking-place">
+    <div class="wrapper">
+      <div class="parking-place__content create">
+
+        <form class="parking-place__form" enctype="multipart/form-data"
+              method="POST">
+          <h2 class="parking-place__form-title">Редактирование машино-места</h2>
+
+          {% csrf_token %}
+
+          {{ form.non_field_errors }}
+
+          {{ form.source.errors }}
+          {{ form.source }}
+
+          {{ form.media.errors }}
+          {{ form.media }}
+
+          {% load widget_tweaks %}
+
+          <!-- ПОЛЕ С ЛОКАЦИЕЙ МАШИНО-МЕСТА НАЧАЛО  -->
+          <div class="parking-place__form-field">
+            <label class="parking-place__form-label">
+              Расположение на карте
+            </label>
+            {{ form.location.errors }}
+            {{ form.location }}
+          </div>
+          <!-- ПОЛЕ С ЛОКАЦИЕЙ МАШИНО-МЕСТА КОНЕЦ  -->
+
+
+          <!-- ПОЛЕ С АДРЕСОМ МАШИНО-МЕСТА НАЧАЛО  -->
+          <div class="parking-place__form-field">
+            <label class="parking-place__form-label">
+              Адрес (улица, ближайший дом)
+            </label>
+            {{ form.title.errors }}
+            {{ form.title }}
+          </div>
+          <!-- ПОЛЕ С АДРЕСОМ МАШИНО-МЕСТА КОНЕЦ  -->
+
+          <div class="parking-place__form-double">
+
+            <!-- ПОЛЕ С ЦЕНОЙ МАШИНО-МЕСТА НАЧАЛО  -->
+            <div class="parking-place__form-field">
+              <label class="parking-place__form-label">
+                Цена за час
+              </label>
+              {{ form.pricePerHour.errors }}
+              {{ form.pricePerHour }}
+            </div>
+            <!-- ПОЛЕ С ЦЕНОЙ МАШИНО-МЕСТА КОНЕЦ  -->
+
+            <!-- ПОЛЕ С БЛИЖАЙШИМ МЕТРО НАЧАЛО  -->
+            <div class="parking-place__form-field">
+              <label class="parking-place__form-label">
+                Ближайшее метро
+              </label>
+              {{ form.subway_station.errors }}
+              {{ form.subway_station }}
+            </div>
+            <!-- ПОЛЕ С БЛИЖАЙШИМ МЕТРО КОНЕЦ  -->
+
+          </div>
+
+          <!-- ПОЛЕ С ОПИСАНИЕМ МАШИНО-МЕСТА НАЧАЛО  -->
+          <div class="parking-place__form-field">
+            <label class="parking-place__form-label">
+              Описание
+            </label>
+            {{ form.description.errors }}
+            {{ form.description }}
+          </div>
+          <!-- ПОЛЕ С ОПИСАНИЕМ МАШИНО-МЕСТА КОНЕЦ  -->
+
+<div style="display: flex; justify-content: space-between; gap: 32px;">
+  <!-- ПОЛЕ СО СТАТУСОМ МАШИНО-МЕСТА НАЧАЛО  -->
+            <div class="parking-place__form-field">
+              <label class="parking-place__form-label">
+              {{ form.readyToRent.label_tag }}
+              </label>
+              {{ form.readyToRent.errors }}
+              {{ form.readyToRent }}
+            </div>
+            <!-- ПОЛЕ СО СТАТУСОМ МАШИНО-МЕСТА КОНЕЦ  -->
+
+             <!-- ПОЛЕ С фОТОГРАФИЕЙ МАШИНО-МЕСТА НАЧАЛО  -->
+          <div class="parking-place__form-field">
+            <label class="parking-place__form-label">
+              {{ form.image.label_tag }}
+            </label>
+            {{ form.image.errors }}
+            <button class="parking-place__button-rent" onclick="document.getElementById('id_image').click()" type="button">
+              Выберите файл
+            </button>
+            <div class="hidden">
+              {% render_field form.image class="hidden" placeholder="up" type="file" %}
+            </div>
+<!--              {% render_field form.image class="parking-place__button-rent" placeholder="up" type="file" %}-->
+          </div>
+          <!-- ПОЛЕ С фОТОГРАФИЕЙ МАШИНО-МЕСТА КОНЕЦ  -->
+</div>
+
+
+          {% for hidden_field in form.hidden_fields %}
+          {% if hidden_field.errors %}
+          <ul>
+            {% for error in hidden_field.errors %}
+            <li>(hidden field {{ hidden_field.name }})</li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+          {{hidden_field}}
+          {% endfor %}
+
+          <div style="display: flex; justify-content: space-between; gap: 32px;">
+          <a href="{%url 'delete_parking' my_parkingPlace.id %}"
+             class="parking-place__button-rent"
+             style="text-align: center; flex: 1;">Удалить</a>
+
+          <button style="flex: 1;" class="parking-place__button-rent" type="submit">Сохранить</button>
+
+          </div>
+
+        </form>
+
+
+      </div>
+    </div>
+  </section>
+</main>
+<script>
+    function renderButton() {
+        let element = document.getElementById('file_button')
+        Array.from(element.childNodes).forEach(elem => {
+            if (elem.nodeName !== "INPUT") {
+                element.removeChild(elem)
+            } else {
+                element.classList.add('hidden')
+            }
+            element.innerText = 'Загрузить файл'
+        })
+    }
+    renderButton()
+    function selectFile() {
+        let element = event.target
+
+    }
+</script>
+{% endblock content %}
