@@ -200,5 +200,10 @@ EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER + "@gmail.com"
 
+# SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
-CSRF_TRUSTED_ORIGINS = ["http://0.0.0.0:8000/"]
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://0.0.0.0",
+    "http://51.250.69.82",
+    "https://51.250.69.82"]

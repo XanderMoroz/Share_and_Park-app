@@ -1,61 +1,93 @@
-version: '3.8'
+version: '3.8'                            # Версия докер-компос
 
-services:
+services:                                 # Объявление списка сервисов
+  # База данных Postgres + Postgis
   db_postgis:
-    container_name: db_postgis
-    image: postgis/postgis:14-3.3
-    environment:
-###      - "POSTGRES_HOST_AUTH_METHOD=trust"
+    container_name: db_postgis            # Название контейнера
+    image: postgis/postgis:14-3.3         # Образ из docker-hub : <версии>
+    environment:                          # Переменные окружения БД
       - POSTGRES_DB=parking_prod
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD="12345"
-    expose:
+    expose:                               # Открываем порт контейнера внутри сети docker
       - 8000
-    env_file:
+    env_file:                             # Файл с переменными окружения
       - ShareAndPark/.env
-    volumes:
+    volumes:                              # Том данных контейнера с бд
       - ./postgres_date:/var/lib/postgresql/data/
-#    ports:
-#      - 5555:5432
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U nameuser -d namedb" ]
+    healthcheck:                          # Проверка активности бд
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d parking_prod" ]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 10s
 
+  # Приложение на Django
   web:
-    container_name: web
-    build:
-      context: .
-      dockerfile:  ShareAndPark/Dockerfile #Dockerfile #
+    container_name: web                     # Название контейнера
+    build:                                  # Инструкция по сборке
+      context: .                            # Где собираем? (прям тут)
+      dockerfile: ShareAndPark/Dockerfile   # Из чего собираем? (из собственного образа)
     volumes:
-      - ../media:/home/app/web/mediafiles  # рядом с проектом должна лежать папка для медиа (на том же уровне)
+      # папка для медиа (на том же уровне где и django)
+      - ../media:/home/app/web/mediafiles
+      # папка для статики - стили, иконки, js-скрипты (на том же уровне где и django)
       - static_volume:/home/app/web/staticfiles
-    command: gunicorn ShareAndPark.wsgi:application --bind 0.0.0.0:8000
-    expose:
-      - 8000
-    ports:
-      - 8080:8000
-    env_file:
+
+    env_file:                     # Файл с переменными окружения для django
       - ShareAndPark/.env
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+    # Запускаем django-проект при помощи gunicorn
+    command: gunicorn ShareAndPark.wsgi:application --bind 0.0.0.0:8000
+    expose:                       # Открываем порт контейнера внутри сети docker
+      - 8000
+#    ports:
+#      - 8080:8000
+#    extra_hosts:
+#      - "host.docker.internal:host-gateway"
+    # Зависимость проекта
     depends_on:
+      # Запускаем django-проект ТОЛЬКО после запуска БД
       - db_postgis
 
+  # Веб-сервер NGINX
   nginx:
-    container_name: nginx
-    build:
-      context: ShareAndPark/nginx
-      dockerfile: Dockerfile
+    container_name: nginx                     # Название контейнера
+    build:                                    # Инструкция по сборке
+      context: ShareAndPark/nginx             # Где собираем?
+      dockerfile: Dockerfile                  # Из чего собираем?
+    # Указываем каталоги в распоряжении контейнера
     volumes:
-      - ../media_dchem:/app/media:ro
-      - static_volume:/app/static:ro
+      - ../media_dchem:/app/media:ro          # Получаем доступ к медиа файлам django
+      - static_volume:/app/static:ro          # Получаем доступ к статике django
+      # новые тома
+#      - certs:/etc/nginx/certs
+#      - html:/usr/share/nginx/html
+#      - vhost:/etc/nginx/vhost.d
+#      - /var/run/docker.sock:/tmp/docker.sock:ro
+    # Открываем публичный порт для доступа извне
     ports:
-      - "8000:80"
+      - "8000:80"       # Пробрасываем порты изнутри (80) наружу (8000)
+    # Зависимость проекта
     depends_on:
+      # Запускаем NGINX ТОЛЬКО после запуска django-проекта
       - web
+
+#  nginx-proxy-letsencrypt:
+#    image: jrcs/letsencrypt-nginx-proxy-companion
+#    env_file:
+#      - ./.env.staging.proxy-companion
+#    volumes:
+#      - /var/run/docker.sock:/var/run/docker.sock:ro
+#      - certs:/etc/nginx/certs
+#      - html:/usr/share/nginx/html
+#      - vhost:/etc/nginx/vhost.d
+#      - acme:/etc/acme.sh
+#    depends_on:
+#      - nginx
 
 volumes:
   static_volume:
+#  certs:
+#  html:
+#  vhost:
+#  acme:
