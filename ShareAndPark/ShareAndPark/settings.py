@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-flihhwy$tc=cy1c8pni&9w))-sf_jr&4h2g16*+glgl1%z3gpg
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DEBUG"),
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['0.0.0.0']
 
 
 # Application definition
@@ -156,6 +156,7 @@ STATICFILES_DIRS = [
      BASE_DIR / "static"
  ]
 
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 MEDIA_URL = '/media/'
 # будет использоваться для управления сохраненными данными,
@@ -198,3 +199,6 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER + "@gmail.com"
+
+
+CSRF_TRUSTED_ORIGINS = ["http://0.0.0.0:8000/"]

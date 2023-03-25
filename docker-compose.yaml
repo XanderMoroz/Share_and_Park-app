@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  db_postgis:
+    container_name: db_postgis
+    image: postgis/postgis:14-3.3
+    environment:
+###      - "POSTGRES_HOST_AUTH_METHOD=trust"
+      - POSTGRES_DB=parking_prod
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD="12345"
+    expose:
+      - 8000
+    env_file:
+      - ShareAndPark/.env
+    volumes:
+      - ./postgres_date:/var/lib/postgresql/data/
+#    ports:
+#      - 5555:5432
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U nameuser -d namedb" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  web:
+    container_name: web
+    build:
+      context: .
+      dockerfile:  ShareAndPark/Dockerfile #Dockerfile #
+    volumes:
+      - ../media:/home/app/web/mediafiles  # рядом с проектом должна лежать папка для медиа (на том же уровне)
+      - static_volume:/home/app/web/staticfiles
+    command: gunicorn ShareAndPark.wsgi:application --bind 0.0.0.0:8000
+    expose:
+      - 8000
+    ports:
+      - 8080:8000
+    env_file:
+      - ShareAndPark/.env
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - db_postgis
+
+  nginx:
+    container_name: nginx
+    build:
+      context: ShareAndPark/nginx
+      dockerfile: Dockerfile
+    volumes:
+      - ../media_dchem:/app/media:ro
+      - static_volume:/app/static:ro
+    ports:
+      - "8000:80"
+    depends_on:
+      - web
+
+volumes:
+  static_volume:
