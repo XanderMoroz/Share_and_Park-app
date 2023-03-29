@@ -30,7 +30,8 @@ services:                                 # Объявление списка с
       dockerfile: ShareAndPark/Dockerfile   # Из чего собираем? (из собственного образа)
     volumes:
       # папка для медиа (на том же уровне где и django)
-      - ../media:/home/app/web/mediafiles
+#      - ../media:/home/app/web/mediafiles
+      - media_volume:/home/app/web/mediafiles
       # папка для статики - стили, иконки, js-скрипты (на том же уровне где и django)
       - static_volume:/home/app/web/staticfiles
 
@@ -57,7 +58,7 @@ services:                                 # Объявление списка с
       dockerfile: Dockerfile                  # Из чего собираем?
     # Указываем каталоги в распоряжении контейнера
     volumes:
-      - ../media_dchem:/app/media:ro          # Получаем доступ к медиа файлам django
+      - media_volume:/app/media:ro          # Получаем доступ к медиа файлам django
       - static_volume:/app/static:ro          # Получаем доступ к статике django
       # новые тома
 #      - certs:/etc/nginx/certs
@@ -87,6 +88,7 @@ services:                                 # Объявление списка с
 
 volumes:
   static_volume:
+  media_volume:
 #  certs:
 #  html:
 #  vhost:

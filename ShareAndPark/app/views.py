@@ -1,20 +1,35 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView, ListView, CreateView, DetailView, UpdateView, DeleteView
 from .models import ParkingPlace, Order, AppUser, BankCard, Сheque
 from .forms import ParkingForm, OrderForm, CloseOrderForm, ProfileForm, BankCardForm
 from .filters import ParkingPlaceFilter
 from django.contrib.auth.models import User
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib import messages
+from django.contrib.auth import login as auth_login
+from django.views.decorators.csrf import csrf_exempt
+
 from django.shortcuts import redirect, render
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 import folium
 from .utils import custom_popup_render
 from django.contrib.auth import authenticate
 
+
+
 # Create your views here.
 
 from django.contrib.postgres.search import SearchVector, SearchQuery, SearchHeadline
 from django.contrib.postgres.search import TrigramSimilarity
+
+
+class CSRFExemptMixin(object):
+   @method_decorator(csrf_exempt)
+   def dispatch(self, *args, **kwargs):
+       return super(CSRFExemptMixin, self).dispatch(*args, **kwargs)
+
 
 
 class MainPage(ListView):
@@ -150,7 +165,7 @@ class ParkingList(ListView):
 
         return context
 
-class ParkingDetail(DetailView, CreateView, LoginRequiredMixin):
+class ParkingDetail(CSRFExemptMixin, DetailView, CreateView, LoginRequiredMixin):
     """Представление машино-места"""
     model = ParkingPlace
     template_name = 'parking/parking_detail.html'       # Относительный адрес шаблона
@@ -191,7 +206,7 @@ class ParkingDetail(DetailView, CreateView, LoginRequiredMixin):
 
         return context
 
-class CreateParking(CreateView, LoginRequiredMixin):
+class CreateParking(CSRFExemptMixin, CreateView, LoginRequiredMixin):
     """Представление для создания машино-места."""
     model = ParkingPlace                                # Имя модели
     template_name = 'parking/create_parking.html'       # Относительный адрес шаблона
@@ -204,7 +219,7 @@ class CreateParking(CreateView, LoginRequiredMixin):
         initial['owner'] = user
         return initial
 
-class UpdateParking(UpdateView, LoginRequiredMixin):
+class UpdateParking(CSRFExemptMixin, UpdateView, LoginRequiredMixin):
     """Представление для редактирования машино-места."""
     template_name = 'parking/edit_parking.html'         # Относительный адрес шаблона
     form_class = ParkingForm                            # Имя формы
@@ -216,13 +231,13 @@ class UpdateParking(UpdateView, LoginRequiredMixin):
         id = self.kwargs.get('pk')
         return ParkingPlace.objects.get(pk=id)
 
-class DeleteParking(DeleteView, LoginRequiredMixin):
+class DeleteParking(CSRFExemptMixin, DeleteView, LoginRequiredMixin):
     """Представление для удаления машино-места."""
     template_name = 'parking/delete_parking.html'       # Относительный адрес шаблона
     queryset = ParkingPlace.objects.all()               # Кварисет (набор) объектов
     success_url = reverse_lazy('profile')               # Перенаправление после удаления
 
-class Profile(TemplateView):
+class Profile(CSRFExemptMixin, TemplateView):
     """Представление профиля пользователя."""
     model = User                                        # Имя модели
     template_name = 'profile/profile.html'              # Относительный адрес шаблона
@@ -263,7 +278,7 @@ class Profile(TemplateView):
 
         return context
 
-class EditProfile(UpdateView):
+class EditProfile(CSRFExemptMixin, UpdateView):
     """Представление для редактирования профиля пользователя."""
     template_name = 'profile/edit_profile.html'         # Относительный адрес шаблона
     form_class = ProfileForm                            # Имя формы
@@ -274,14 +289,7 @@ class EditProfile(UpdateView):
         id = self.kwargs.get('pk')
         return AppUser.objects.get(pk=id)
 
-class OrderDetail(DetailView):
-    """Представление брони машиноместа."""
-    model = ParkingPlace                                # Имя модели
-    template_name = 'baseapp/order_detail.html'         # Относительный адрес шаблона
-    context_object_name = 'order_detail'                # Имя для обращения в контексте
-
-
-
+@csrf_exempt
 def create_order(request, **kwargs):
     """Функция создания брони машиноместа."""
     current_parking_place = ParkingPlace.objects.get(pk=kwargs['pk'])
@@ -291,7 +299,7 @@ def create_order(request, **kwargs):
     Order.objects.create(parkingPlace=current_parking_place,
                          arendator=current_user_profile)
 
-class UpdateOrder(UpdateView):
+class UpdateOrder(CSRFExemptMixin, UpdateView):
     """Представление для завершения брони машиноместа."""
     template_name = 'profile/edit_order.html'           # Относительный адрес шаблона
     form_class = CloseOrderForm                         # Имя формы
@@ -337,7 +345,7 @@ class UpdateOrder(UpdateView):
 #
 #     return redirect(request.META.get('HTTP_REFERER', '/'))
 
-class CreateBankCard(CreateView, LoginRequiredMixin):
+class CreateBankCard(CSRFExemptMixin, CreateView, LoginRequiredMixin):
     """Представление для создания банковской карты."""
     model = BankCard                                    # Имя модели
     template_name = 'bankcard/create_bankcard.html'      # Относительный адрес шаблона
@@ -350,7 +358,7 @@ class CreateBankCard(CreateView, LoginRequiredMixin):
         initial['owner'] = user
         return initial
 
-class UpdateBankCard(UpdateView, LoginRequiredMixin):
+class UpdateBankCard(CSRFExemptMixin, UpdateView, LoginRequiredMixin):
     """Представление для редактирования банковской карты."""
     template_name = 'bankcard/edit_bankcard.html'         # Относительный адрес шаблона
     form_class = BankCardForm                            # Имя формы
@@ -368,9 +376,29 @@ class DeleteBankCard(DeleteView, LoginRequiredMixin):
     queryset = BankCard.objects.all()                    # Кварисет (набор) схожих объектов
     success_url = reverse_lazy('profile')                # Перенаправление после удаления
 
-
+@csrf_exempt
 def handler404(request, exception):
     return render(request, '404.html', status=404)
-
+@csrf_exempt
 def handler500(request):
     return render(request, '500.html', status=404)
+
+@csrf_exempt
+def new_login(request):
+    if request.method == 'POST':
+        form = AuthenticationForm(request.POST)
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(username=username, password=password)
+        if user:
+            if user.is_active:
+                auth_login(request, user)
+                return redirect(reverse('profile'))
+        else:
+            messages.error(request, 'username or password not correct')
+            return redirect(reverse('new_login'))
+
+
+    else:
+        form = AuthenticationForm()
+    return render(request, 'registration/login.html', {'form': form})

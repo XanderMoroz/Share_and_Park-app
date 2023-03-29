@@ -15,6 +15,7 @@ from .views import (
     UpdateBankCard,
     DeleteBankCard,
     UpdateOrder,
+    new_login
 )
 
 handler404 = "app.views.handler404"
@@ -40,4 +41,6 @@ urlpatterns = [
     path('edit_bankcard/<int:pk>', UpdateBankCard.as_view(), name='update_bankcard'),   # Редактировать карту
     path('delete_bankcard/<int:pk>', DeleteBankCard.as_view(), name='delete_bankcard'), # Удалить карту
     # path('stop_arenda/<int:pk>', stop_arendation, name='stop_arendation'),
+
+    path('accounts/login/', new_login, name='new_login'),
 ]
